@@ -9,5 +9,7 @@
   <ItemGroup>
     <ProjectReference Include="..\Loggy.ServiceDefaults\Loggy.ServiceDefaults.csproj" />
   </ItemGroup>
-
+  <ItemGroup>
+    <ProjectReference Include="..\Loggy.Models\Loggy.Models.csproj" />
+  </ItemGroup>
 </Project>
