@@ -5,10 +5,11 @@ using System.Text.Json;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Loggy.Models;
+using Loggy.ApiService.Services.Interfaces;
 
 namespace Loggy.ApiService.Services.Classes
 {
-    public class EventProcessorService
+    public class EventProcessorService : IEventProcessorService
     {
         private static readonly JsonSerializerOptions _jsonOptions = new()
         {
@@ -53,6 +54,15 @@ namespace Loggy.ApiService.Services.Classes
                     events.Add(logEvent);
             }
             return events;
+        }
+
+        public Dictionary<string, List<LogEvent>> SortEventsByTimeStamp(List<LogEvent> events)
+        {
+            ArgumentNullException.ThrowIfNull(events);
+
+            return events
+                .GroupBy(e => e?.Timestamp)
+                .ToDictionary(g => g.Key.ToString() ?? "No timestamp", g => g.ToList());
         }
     }
 }

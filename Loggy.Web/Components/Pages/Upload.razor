@@ -6,22 +6,34 @@
 
 <div class="row">
     <div class="col-auto">
-        <InputFile id="file-upload" class="btn btn-primary" OnChange="OnFileChange" />
+        <InputFile id="file-upload" class="form-control" OnChange="OnFileChange" />
     </div>
     <div class="col-auto">
         <button type="button" id="upload-button" class="btn btn-primary" @onclick="GetLogsFromFile">Upload</button>
     </div>
 </div>
 <div class="row">
+    <div class="col-auto"> 
+        <select class="form-select" id="logTypeSelect" @bind="logTypeSelected" @bind:event="onchange">
+            <option value="SerilogUpload">Serilog (Default)</option>
+        </select>
+    </div>
+    <div class="col-auto">
+        <select class="form-select" id="sortOptions" @bind="sortOptionSelected" @bind:event="onchange">
+            <option value="0">By Exception</option>
+            <option value="1">By TimeStamp</option>
+        </select>
+    </div>
+</div>
+<div class="row">
     <div class="col">
         <div id="logs">
-            @if (logFile != null) { <p>File selected: @logFile.Name</p> }
             @if (logs != null)
             {
                 <h3>Logs:</h3>
                 @foreach (var log in logs)
                 {
-                    <div class="log-entry">
+                    <div class="">
                         <h4>@log.Key</h4>
                         <ul>
                             @foreach (var logEvent in log.Value)
@@ -31,7 +43,7 @@
                         </ul>
                     </div>
                 }
-            }   
+            }
         </div>
     </div>
 </div>
@@ -39,17 +51,18 @@
 @code {
     private IBrowserFile? logFile;
     public Dictionary<string, List<LogEvent>>? logs;
-
+    private int sortOptionSelected;
+    private string logTypeSelected = "SerilogUpload";
     private void OnFileChange(InputFileChangeEventArgs e)
     {
-        logFile = e.File; // or e.GetMultipleFiles() if you need multiple
-            StateHasChanged();
+        logFile = e.File;
+        StateHasChanged();
     }
 
     public async Task GetLogsFromFile()
     {
         if (logFile == null) return;
-        logs = await logUploadApi.UploadLogAsync(logFile);
-            StateHasChanged();
+        logs = await logUploadApi.UploadLogAsync(logFile, logTypeSelected, sortOptionSelected);
+        StateHasChanged();
     }
 }
