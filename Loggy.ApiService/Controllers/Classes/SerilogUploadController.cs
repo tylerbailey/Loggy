@@ -8,7 +8,7 @@ namespace Loggy.ApiService.Controllers.Classes
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class SerilogUploadController(IEventProcessorService eventProcessorService) : ControllerBase, IUploadControllerBase
+    public class SerilogUploadController(IEventProcessorService eventProcessorService) : ControllerBase, IUploadController
     {
         private readonly IEventProcessorService _eventProcessorService = eventProcessorService;
 

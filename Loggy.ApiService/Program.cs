@@ -1,11 +1,11 @@
+using Loggy.ApiService;
 using Loggy.ApiService.Services.Classes;
 using Loggy.ApiService.Services.Interfaces;
 
 var builder = WebApplication.CreateBuilder(args);
-
 // Add service defaults & Aspire client integrations.
 builder.AddServiceDefaults();
-builder.Services.AddControllers(); 
+builder.Services.AddControllers();
 // Add services to the container.
 builder.Services.AddProblemDetails();
 
@@ -14,6 +14,9 @@ builder.Services.AddOpenApi();
 
 //Dependency Injection for Aspire client
 builder.Services.AddScoped<IEventProcessorService, EventProcessorService>();
+builder.Services.Configure<Options>(builder.Configuration.GetSection("MyService"));
+builder.Services.AddHttpClient();
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
