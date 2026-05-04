@@ -1,0 +1,85 @@
+@page "/loggy"
+@using Microsoft.AspNetCore.Components.Forms
+@using Loggy.Models
+@inject LogUploadApiClient logUploadApi
+@rendermode InteractiveServer
+
+<div class="container">
+    <div class="row mb-3">
+        <div class="col-auto">
+            <InputFile id="file-upload" class="form-control" OnChange="OnFileChange" />
+        </div>
+        <div class="col-auto">
+            <button type="button" id="upload-button" class="btn btn-primary" @onclick="GetLogsFromFile">Upload</button>
+        </div>
+    </div>
+    <div class="row mb-3">
+        <div class="col-auto">
+            <select class="form-select" id="logTypeSelect" @bind="logTypeSelected" @bind:event="onchange">
+                <option value="SerilogUpload">Serilog (Default)</option>
+            </select>
+        </div>
+        <div class="col-auto">
+            <select class="form-select" id="sortOptions" @bind="sortOptionSelected" @bind:event="onchange">
+                <option value="0">By Exception</option>
+                <option value="1">By TimeStamp</option>
+            </select>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col">
+            @if (logs != null)
+            {
+                <div class="accordion" id="exceptionAccordion">
+                    @foreach (var (log, logGroupCount) in logs.Select((k, i) => (k, i)))
+                    {
+                        <div class="accordion-item">
+                            <h2 class="accordion-header">
+                                <button class="accordion-button collapsed"
+                                        type="button"
+                                        data-bs-toggle="collapse"
+                                        data-bs-target="@($"#collapseItem{logGroupCount}")"
+                                        aria-expanded="false"
+                                        aria-controls="@($"collapseItem{logGroupCount}")">
+                                    @log.Key
+                                </button>
+                            </h2>
+                            <div id="@($"collapseItem{logGroupCount}")"
+                                 class="accordion-collapse collapse"
+                                 data-bs-parent="#exceptionAccordion">
+                                <div class="accordion-body">
+                                    <ul>
+                                        @foreach (var (logEvent, logCount) in log.Value.Select((e, i) => (e, i)))
+                                        {
+                                            <li id="@($"logEvent{logGroupCount}_{logCount}")">
+                                                @logEvent.Timestamp: @logEvent.Message
+                                            </li>
+                                        }
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                </div>
+            }
+        </div>
+    </div>
+</div>
+@code {
+    private IBrowserFile? logFile;
+    public Dictionary<string, List<LogEvent>>? logs;
+    private int sortOptionSelected;
+    private string logTypeSelected = "SerilogUpload";
+    private void OnFileChange(InputFileChangeEventArgs e)
+    {
+        logFile = e.File;
+        StateHasChanged();
+    }
+
+    public async Task GetLogsFromFile()
+    {
+        if (logFile == null) return;
+        logs = await logUploadApi.UploadLogAsync(logFile, logTypeSelected, sortOptionSelected);
+        StateHasChanged();
+    }
+}

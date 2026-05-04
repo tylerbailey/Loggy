@@ -9,9 +9,11 @@
   <ItemGroup>
     <ProjectReference Include="..\Loggy.ServiceDefaults\Loggy.ServiceDefaults.csproj" />
   </ItemGroup>
-
   <ItemGroup>
-    <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="10.0.1" />
+    <ProjectReference Include="..\Loggy.Models\Loggy.Models.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="10.0.7" />
   </ItemGroup>
 
 </Project>

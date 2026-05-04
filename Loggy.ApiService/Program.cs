@@ -1,14 +1,19 @@
+using Loggy.ApiService.Services.Classes;
+using Loggy.ApiService.Services.Interfaces;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add service defaults & Aspire client integrations.
 builder.AddServiceDefaults();
-
+builder.Services.AddControllers(); 
 // Add services to the container.
 builder.Services.AddProblemDetails();
 
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
 
+//Dependency Injection for Aspire client
+builder.Services.AddScoped<IEventProcessorService, EventProcessorService>();
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -38,7 +43,7 @@ app.MapGet("/weatherforecast", () =>
 .WithName("GetWeatherForecast");
 
 app.MapDefaultEndpoints();
-
+app.MapControllers();
 app.Run();
 
 record WeatherForecast(DateOnly Date, int TemperatureC, string? Summary)
