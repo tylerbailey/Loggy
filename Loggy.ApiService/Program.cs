@@ -13,9 +13,18 @@ builder.Services.AddProblemDetails();
 builder.Services.AddOpenApi();
 
 //Dependency Injection for Aspire client
-builder.Services.AddScoped<IEventProcessorService, EventProcessorService>();
+builder.Services.AddScoped<IEventProcessorService, SerilogEventProcessorService>();
 builder.Services.Configure<Options>(builder.Configuration.GetSection("MyService"));
-builder.Services.AddHttpClient();
+builder.Services.AddHttpClient("gemini", client =>
+{
+    client.Timeout = TimeSpan.FromSeconds(120);
+})
+.AddStandardResilienceHandler(options =>
+{
+    options.TotalRequestTimeout.Timeout = TimeSpan.FromSeconds(120);
+    options.AttemptTimeout.Timeout = TimeSpan.FromSeconds(120);
+    options.CircuitBreaker.SamplingDuration = TimeSpan.FromSeconds(240); // Must be 2x AttemptTimeout
+});
 
 var app = builder.Build();
 
@@ -27,29 +36,9 @@ if (app.Environment.IsDevelopment())
     app.MapOpenApi();
 }
 
-string[] summaries = ["Freezing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot", "Sweltering", "Scorching"];
-
-app.MapGet("/", () => "API service is running. Navigate to /weatherforecast to see sample data.");
-
-app.MapGet("/weatherforecast", () =>
-{
-    var forecast = Enumerable.Range(1, 5).Select(index =>
-        new WeatherForecast
-        (
-            DateOnly.FromDateTime(DateTime.Now.AddDays(index)),
-            Random.Shared.Next(-20, 55),
-            summaries[Random.Shared.Next(summaries.Length)]
-        ))
-        .ToArray();
-    return forecast;
-})
-.WithName("GetWeatherForecast");
 
 app.MapDefaultEndpoints();
 app.MapControllers();
 app.Run();
 
-record WeatherForecast(DateOnly Date, int TemperatureC, string? Summary)
-{
-    public int TemperatureF => 32 + (int)(TemperatureC / 0.5556);
-}
+

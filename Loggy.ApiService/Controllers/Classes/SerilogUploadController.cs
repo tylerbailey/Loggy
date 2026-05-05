@@ -12,9 +12,7 @@ namespace Loggy.ApiService.Controllers.Classes
     {
         private readonly IEventProcessorService _eventProcessorService = eventProcessorService;
 
-        // POST api/<UploadController>
         [HttpPost("SortByException")]
-
         public async Task<IActionResult> SortByException([FromForm] IFormFile file)
         {
             if (file == null)

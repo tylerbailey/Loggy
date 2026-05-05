@@ -1,6 +1,7 @@
 <Solution>
   <Project Path="Loggy.ApiService/Loggy.ApiService.csproj" />
   <Project Path="Loggy.AppHost/Loggy.AppHost.csproj" />
+  <Project Path="Loggy.Models/Loggy.Models.csproj" />
   <Project Path="Loggy.ServiceDefaults/Loggy.ServiceDefaults.csproj" />
   <Project Path="Loggy.Tests/Loggy.Tests.csproj" />
   <Project Path="Loggy.Web/Loggy.Web.csproj" />

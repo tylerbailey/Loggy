@@ -9,7 +9,7 @@ using Loggy.ApiService.Services.Interfaces;
 
 namespace Loggy.ApiService.Services.Classes
 {
-    public class EventProcessorService : IEventProcessorService
+    public class SerilogEventProcessorService : IEventProcessorService
     {
         private static readonly JsonSerializerOptions _jsonOptions = new()
         {
@@ -22,7 +22,7 @@ namespace Loggy.ApiService.Services.Classes
 
             return events
                 .GroupBy(e => e?.Exception)
-                .ToDictionary(g => g.Key ?? "<null>", g => g.ToList());
+                .ToDictionary(g => g.Key ?? "None", g => g.ToList());
         }
 
         public async Task<List<LogEvent>> GetEventsFromFile(IFormFile file)
