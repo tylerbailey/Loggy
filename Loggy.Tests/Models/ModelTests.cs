@@ -160,7 +160,7 @@ public class EnumsTests
     [Fact]
     public void SchemaTypes_InvalidValue_ThrowsArgumentException()
     {
-        Assert.Throws<ArgumentException>(() => Enum.Parse<Enums.SchemaTypes>("99"));
+        Assert.Throws<ArgumentException>(() => Enum.Parse<Enums.SchemaTypes>("MyCustom"));
     }
 }
 

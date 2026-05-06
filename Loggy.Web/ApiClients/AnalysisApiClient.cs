@@ -25,8 +25,10 @@ namespace Loggy.Web.ApiClients
     .FirstOrDefault()?.Content
     .Parts.FirstOrDefault()?.Text ?? "No response";
 
-            var analysis = JsonSerializer.Deserialize<LogAnalysis>(text) ?? new LogAnalysis();
-            return analysis;
+            LogAnalysis? analysis = null;
+            try { analysis = JsonSerializer.Deserialize<LogAnalysis>(text); }
+            catch (JsonException) { }
+            return analysis ?? new LogAnalysis();
 
         }
     }
