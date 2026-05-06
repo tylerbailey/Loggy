@@ -8,7 +8,7 @@ namespace Loggy.Web.ApiClients
     public class AnalysisApiClient(HttpClient httpClient)
     {
 
-        public async Task<GeminiResponse> AnalyzeLogsAsync(Dictionary<string, List<LogEvent>> logs, int modelOption, CancellationToken cancellationToken = default)
+        public async Task<LogAnalysis> AnalyzeLogsAsync(Dictionary<string, List<SeriLogEvent>> logs, int modelOption, CancellationToken cancellationToken = default)
         {
 
 
@@ -21,7 +21,13 @@ namespace Loggy.Web.ApiClients
             response.EnsureSuccessStatusCode();      
             var responseBody = await response.Content.ReadAsStringAsync();
             var responseObjects = JsonSerializer.Deserialize<GeminiResponse>(responseBody) ?? new GeminiResponse();
-            return responseObjects;
+            var text = responseObjects.Candidates
+    .FirstOrDefault()?.Content
+    .Parts.FirstOrDefault()?.Text ?? "No response";
+
+            var analysis = JsonSerializer.Deserialize<LogAnalysis>(text) ?? new LogAnalysis();
+            return analysis;
+
         }
     }
 }

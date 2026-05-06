@@ -25,15 +25,29 @@ namespace Loggy.ApiService.Controllers.Classes
         }
 
         [HttpPost("Query")]
-        public async Task<IActionResult> QueryAsync(Dictionary<string, List<LogEvent>> logs)
+        public async Task<IActionResult> QueryAsync(Dictionary<string, List<SeriLogEvent>> logs)
         {
-            
 
-     
-            var json = JsonSerializer.Serialize(logs);
+
+            var trimmed = logs.SelectMany(kvp => kvp.Value)
+                            .Select(e => new
+                            {
+                                e.Id,
+                                e.Timestamp,
+                                e.Level,
+                                e.Message,
+                                e.Exception,
+                                e.Source
+                            });
+
+            var json = JsonSerializer.Serialize(trimmed, new JsonSerializerOptions
+            {
+                Encoder = System.Text.Encodings.Web.JavaScriptEncoder.UnsafeRelaxedJsonEscaping
+            });
+
 
             var client = _httpClientFactory.CreateClient();
-            client.Timeout = TimeSpan.FromSeconds(120); 
+            client.Timeout = TimeSpan.FromSeconds(120);
             var request = new GeminiRequest
             {
                 Contents = new List<GeminiContentPart>
@@ -42,10 +56,30 @@ namespace Loggy.ApiService.Controllers.Classes
             {
                 Parts = new List<GeminiPart>
                 {
-                    new GeminiPart
-                    {
-                        Text = $"Summarize the following logs. Give a detailed breakdown on patterns and any other useful information: {json}"
-                    }
+                   new() {
+                    Text = $@"Analyze the following logs and respond ONLY with a JSON object in this exact format, no markdown, no backticks:
+                            {{
+                                ""summary"": ""brief overall summary"",
+                                ""timeRange"": ""start time to end time"",
+                                ""patterns"": [
+                                    {{
+                                        ""title"": ""pattern name"",
+                                        ""severity"": ""Critical|High|Medium|Low"",
+                                        ""description"": ""what is happening"",
+                                        ""recommendation"": ""what to do about it"",
+                                        ""relatedEventIds"": [1, 2, 3]
+                                    }}
+                                ],
+                                ""errorCounts"": {{
+                                    ""critical"": 0,
+                                    ""warnings"": 0,
+                                    ""errors"": 0,
+                                    ""info"": 0
+                                }}
+                            }}
+                            Each log event has an Id field. Use those Id values in relatedEventIds to reference the specific events that belong to each pattern.
+                            Logs: {json}"
+                   }
                 }
             }
         }

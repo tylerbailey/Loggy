@@ -16,7 +16,7 @@ namespace Loggy.ApiService.Services.Classes
             PropertyNameCaseInsensitive = true
         };
 
-        public Dictionary<string, List<LogEvent>> SortEventsByException(List<LogEvent> events)
+        public Dictionary<string, List<SeriLogEvent>> SortEventsByException(List<SeriLogEvent> events)
         {
             ArgumentNullException.ThrowIfNull(events);
 
@@ -25,7 +25,7 @@ namespace Loggy.ApiService.Services.Classes
                 .ToDictionary(g => g.Key ?? "None", g => g.ToList());
         }
 
-        public async Task<List<LogEvent>> GetEventsFromFile(IFormFile file)
+        public async Task<List<SeriLogEvent>> GetEventsFromFile(IFormFile file)
         {
             using var stream = file.OpenReadStream();
             using var reader = new StreamReader(stream);
@@ -39,24 +39,29 @@ namespace Loggy.ApiService.Services.Classes
             // JSON array
             if (content.StartsWith('['))
             {
-                return JsonSerializer.Deserialize<List<LogEvent>>(content, _jsonOptions) ?? [];
+                return JsonSerializer.Deserialize<List<SeriLogEvent>>(content, _jsonOptions) ?? [];
             }
 
             // NDJSON - one JSON object per line
-            var events = new List<LogEvent>();
+            var events = new List<SeriLogEvent>();
             foreach (var line in content.Split('\n'))
             {
                 var trimmed = line.Trim();
                 if (string.IsNullOrWhiteSpace(trimmed)) continue;
 
-                var logEvent = JsonSerializer.Deserialize<LogEvent>(trimmed, _jsonOptions);
+                var logEvent = JsonSerializer.Deserialize<SeriLogEvent>(trimmed, _jsonOptions);
+                
                 if (logEvent != null)
                     events.Add(logEvent);
             }
+
+            for (int i = 0; i < events.Count; i++)
+                events[i].Id = i + 1;
+
             return events;
         }
 
-        public Dictionary<string, List<LogEvent>> SortEventsByTimeStamp(List<LogEvent> events)
+        public Dictionary<string, List<SeriLogEvent>> SortEventsByTimeStamp(List<SeriLogEvent> events)
         {
             ArgumentNullException.ThrowIfNull(events);
 

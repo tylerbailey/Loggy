@@ -7,7 +7,7 @@ namespace Loggy.Web.ApiClients;
 
 public class LogUploadApiClient(HttpClient httpClient)
 {
-    public async Task<Dictionary<string, List<LogEvent>>> UploadLogAsync(IBrowserFile file, int schemaType, int sortOption, int modelOption, CancellationToken cancellationToken = default)
+    public async Task<Dictionary<string, List<SeriLogEvent>>> UploadLogAsync(IBrowserFile file, int schemaType, int sortOption, int modelOption, CancellationToken cancellationToken = default)
     {
         using var content = new MultipartFormDataContent();
         using var stream = file.OpenReadStream(maxAllowedSize: 10 * 1024 * 1024, cancellationToken: cancellationToken); // 10MB limit, adjust as needed
@@ -16,8 +16,6 @@ public class LogUploadApiClient(HttpClient httpClient)
         //Parse enum values
         var translatedSchemaType = Enum.Parse<Enums.SchemaTypes>(schemaType.ToString());
         var translatedSortOption = Enum.Parse<Enums.SortOptions>(sortOption.ToString());
-
-
 
         streamContent.Headers.ContentType = new MediaTypeHeaderValue(file.ContentType);
         content.Add(streamContent, "file", file.Name);
@@ -30,7 +28,7 @@ public class LogUploadApiClient(HttpClient httpClient)
         response.EnsureSuccessStatusCode();
 
         var json = await response.Content.ReadAsStringAsync(cancellationToken);
-        return JsonSerializer.Deserialize<Dictionary<string, List<LogEvent>>>(json) ?? [];
+        return JsonSerializer.Deserialize<Dictionary<string, List<SeriLogEvent>>>(json) ?? [];
     }
 }
 
