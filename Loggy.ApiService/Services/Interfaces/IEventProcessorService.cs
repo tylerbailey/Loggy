@@ -4,8 +4,8 @@ namespace Loggy.ApiService.Services.Interfaces
 {
     public interface IEventProcessorService
     {
-        Dictionary<string, List<LogEvent>> SortEventsByException(List<LogEvent> events);
-        Dictionary<string, List<LogEvent>> SortEventsByTimeStamp(List<LogEvent> events);
-        Task<List<LogEvent>> GetEventsFromFile(IFormFile file);
+        Dictionary<string, List<SeriLogEvent>> SortEventsByException(List<SeriLogEvent> events);
+        Dictionary<string, List<SeriLogEvent>> SortEventsByTimeStamp(List<SeriLogEvent> events);
+        Task<List<SeriLogEvent>> GetEventsFromFile(IFormFile file);
     }
 }

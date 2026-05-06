@@ -1,7 +1,10 @@
-@page "/loggy"
-@using Microsoft.AspNetCore.Components.Forms
+@page "/"
 @using Loggy.Models
+@using Loggy.Web.ApiClients
+@using Microsoft.AspNetCore.Components.Forms
+@using Loggy.Models.Gemini
 @inject LogUploadApiClient logUploadApi
+@inject AnalysisApiClient analysisApiClient
 @rendermode InteractiveServer
 
 <div class="container">
@@ -12,74 +15,167 @@
         <div class="col-auto">
             <button type="button" id="upload-button" class="btn btn-primary" @onclick="GetLogsFromFile">Upload</button>
         </div>
+        @if (logs != null)
+        {
+            <div class="col-auto">
+                <button type="button" id="analyze-button" class="btn btn-success" @onclick="AnalyzeLogs">Analyze</button>
+            </div>
+        }
     </div>
     <div class="row mb-3">
         <div class="col-auto">
-            <select class="form-select" id="logTypeSelect" @bind="logTypeSelected" @bind:event="onchange">
-                <option value="SerilogUpload">Serilog (Default)</option>
+            <select class="form-select" id="modelTypeSelect" @bind="schemaTypeSelected">
+                <option value="0">Gemini-2.5-flash</option>
             </select>
         </div>
         <div class="col-auto">
-            <select class="form-select" id="sortOptions" @bind="sortOptionSelected" @bind:event="onchange">
+            <select class="form-select" id="logTypeSelect" @bind="schemaTypeSelected">
+                <option value="0">Serilog (Default)</option>
+            </select>
+        </div>
+        <div class="col-auto">
+            <select class="form-select" id="sortOptions" @bind="sortOptionSelected">
                 <option value="0">By Exception</option>
                 <option value="1">By TimeStamp</option>
             </select>
         </div>
     </div>
-    <div class="row">
-        <div class="col">
-            @if (logs != null)
-            {
-                <div class="accordion" id="exceptionAccordion">
-                    @foreach (var (log, logGroupCount) in logs.Select((k, i) => (k, i)))
+    @if (logs != null)
+    {
+        
+
+   
+        @if (analysisResult != null)
+        {
+            <div class="row mb-3">
+                <div class="col-12">
+                    <div class="card mb-3">
+                        <div class="card-body">
+                            <h5 class="card-title">Summary</h5>
+                            <p class="card-text">@analysisResult.Summary</p>
+                            <p class="card-text"><small class="text-muted">@analysisResult.TimeRange</small></p>
+                        </div>
+                    </div>
+
+                    <div class="card mb-3">
+                        <div class="card-body">
+                            <h5 class="card-title">Error Counts</h5>
+                            <ul class="list-group list-group-flush">
+                                <li class="list-group-item text-danger">Critical: @analysisResult.ErrorCounts.Critical</li>
+                                <li class="list-group-item text-warning">Warnings: @analysisResult.ErrorCounts.Warnings</li>
+                                <li class="list-group-item text-danger">Errors: @analysisResult.ErrorCounts.Errors</li>
+                                <li class="list-group-item text-info">Info: @analysisResult.ErrorCounts.Info</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    @foreach (var pattern in analysisResult.Patterns)
                     {
-                        <div class="accordion-item">
-                            <h2 class="accordion-header">
-                                <button class="accordion-button collapsed"
-                                        type="button"
-                                        data-bs-toggle="collapse"
-                                        data-bs-target="@($"#collapseItem{logGroupCount}")"
-                                        aria-expanded="false"
-                                        aria-controls="@($"collapseItem{logGroupCount}")">
-                                    @log.Key
-                                </button>
-                            </h2>
-                            <div id="@($"collapseItem{logGroupCount}")"
-                                 class="accordion-collapse collapse"
-                                 data-bs-parent="#exceptionAccordion">
-                                <div class="accordion-body">
-                                    <ul>
-                                        @foreach (var (logEvent, logCount) in log.Value.Select((e, i) => (e, i)))
-                                        {
-                                            <li id="@($"logEvent{logGroupCount}_{logCount}")">
-                                                @logEvent.Timestamp: @logEvent.Message
-                                            </li>
-                                        }
-                                    </ul>
-                                </div>
+                        <div class="card mb-2">
+                            <div class="card-body">
+                                <h6 class="card-title">
+                                    <span class="badge bg-@GetSeverityColor(pattern.Severity)">@pattern.Severity</span>
+                                    @pattern.Title
+                                </h6>
+                                <p class="card-text">@pattern.Description</p>
+                                <p class="card-text"><strong>Recommendation:</strong> @pattern.Recommendation</p>
                             </div>
                         </div>
                     }
                 </div>
-            }
+            </div>
+        }
+
+    
+        <div class="row">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">Logs</h5>
+                        <div class="accordion" id="exceptionAccordion">
+                            @foreach (var (log, logGroupCount) in logs.Select((k, i) => (k, i)))
+                            {
+                                <div class="accordion-item">
+                                    <h2 class="accordion-header">
+                                        <button class="accordion-button collapsed"
+                                                type="button"
+                                                data-bs-toggle="collapse"
+                                                data-bs-target="@($"#collapseItem{logGroupCount}")"
+                                                aria-expanded="false"
+                                                aria-controls="@($"collapseItem{logGroupCount}")">
+                                            @log.Key
+                                        </button>
+                                    </h2>
+                                    <div id="@($"collapseItem{logGroupCount}")"
+                                         class="accordion-collapse collapse"
+                                         data-bs-parent="#exceptionAccordion">
+                                        <div class="accordion-body">
+                                            <ul>
+                                                @foreach (var (logEvent, logCount) in log.Value.Select((e, i) => (e, i)))
+                                                {
+                                                    <li @key="logEvent.Id" class="@GetHighlightClass(logEvent.Id)">
+                                                        @logEvent.Id - @logEvent.Timestamp: @logEvent.Message
+                                                    </li>
+                                                }
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </div>
+                            }
+
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
-    </div>
+    }
 </div>
+
+    
 @code {
+    public Dictionary<string, List<SeriLogEvent>>? logs;
     private IBrowserFile? logFile;
-    public Dictionary<string, List<LogEvent>>? logs;
+
     private int sortOptionSelected;
-    private string logTypeSelected = "SerilogUpload";
+    private int schemaTypeSelected;
+    private int modelOptionSelected;
+    private LogAnalysis? analysisResult;
+
     private void OnFileChange(InputFileChangeEventArgs e)
     {
         logFile = e.File;
+        logs = null;
         StateHasChanged();
+    }
+
+    public async Task AnalyzeLogs()
+    {
+        if (logs == null) return;
+        analysisResult = await analysisApiClient.AnalyzeLogsAsync(logs, modelOptionSelected);
+        StateHasChanged();
+
     }
 
     public async Task GetLogsFromFile()
     {
         if (logFile == null) return;
-        logs = await logUploadApi.UploadLogAsync(logFile, logTypeSelected, sortOptionSelected);
+        logs = await logUploadApi.UploadLogAsync(logFile, schemaTypeSelected, sortOptionSelected, modelOptionSelected);
         StateHasChanged();
+    }
+
+    private string GetSeverityColor(string severity) => severity switch
+    {
+        "Critical" => "danger",
+        "High" => "warning",
+        "Medium" => "info",
+        "Low" => "secondary",
+        _ => "secondary"
+    };
+    private string GetHighlightClass(int id)
+    {
+        if (analysisResult?.Patterns == null) return "";
+        return analysisResult.Patterns.Any(p => p.RelatedEventIds.Contains(id))
+            ? "list-group-item list-group-item-" + GetSeverityColor(analysisResult.Patterns.Where(p => p.RelatedEventIds.Contains(id)).FirstOrDefault()?.Severity ?? "secondary")
+            : "list-group-item";
     }
 }
