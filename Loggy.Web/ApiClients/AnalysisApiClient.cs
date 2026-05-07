@@ -8,7 +8,7 @@ namespace Loggy.Web.ApiClients
     public class AnalysisApiClient(HttpClient httpClient)
     {
 
-        public async Task<LogAnalysis> AnalyzeLogsAsync(Dictionary<string, List<SeriLogEvent>> logs, int modelOption, CancellationToken cancellationToken = default)
+        public async Task<LogAnalysis> AnalyzeLogsAsync(List<LogEvent> logs, int modelOption, CancellationToken cancellationToken = default)
         {
 
 
