@@ -15,8 +15,8 @@ namespace Loggy.ApiService.Controllers.Classes
         private readonly IOptions<Options> _options;
         private readonly IHttpClientFactory _httpClientFactory;
         private readonly string endpoint;
-        private readonly IEventProcessorService _eventProcessorService;
-        public GeminiAPIController(IOptions<Options> options, IHttpClientFactory httpClientFactory, IEventProcessorService eventProcessorService)
+        private readonly IEventProcessingService _eventProcessorService;
+        public GeminiAPIController(IOptions<Options> options, IHttpClientFactory httpClientFactory, IEventProcessingService eventProcessorService)
         {
             _options = options;
             _httpClientFactory = httpClientFactory;
@@ -25,22 +25,10 @@ namespace Loggy.ApiService.Controllers.Classes
         }
 
         [HttpPost("Query")]
-        public async Task<IActionResult> QueryAsync(Dictionary<string, List<SeriLogEvent>> logs)
+        public async Task<IActionResult> QueryAsync(List<LogEvent> logs)
         {
 
-
-            var trimmed = logs.SelectMany(kvp => kvp.Value)
-                            .Select(e => new
-                            {
-                                e.Id,
-                                e.Timestamp,
-                                e.Level,
-                                e.Message,
-                                e.Exception,
-                                e.Source
-                            });
-
-            var json = JsonSerializer.Serialize(trimmed, new JsonSerializerOptions
+            var json = JsonSerializer.Serialize(logs, new JsonSerializerOptions
             {
                 Encoder = System.Text.Encodings.Web.JavaScriptEncoder.UnsafeRelaxedJsonEscaping
             });
