@@ -26,8 +26,14 @@ builder.Services.AddHttpClient("gemini", client =>
 
 builder.Services.AddHttpClient<LogUploadApiClient>(client =>
 {
-
     client.BaseAddress = new("https+http://apiservice");
+    client.Timeout = TimeSpan.FromSeconds(120);
+})
+.AddStandardResilienceHandler(options =>
+{
+    options.TotalRequestTimeout.Timeout = TimeSpan.FromSeconds(120);
+    options.AttemptTimeout.Timeout = TimeSpan.FromSeconds(120);
+    options.CircuitBreaker.SamplingDuration = TimeSpan.FromSeconds(240);
 });
 
 builder.Services.AddHttpClient<AnalysisApiClient>(client =>
