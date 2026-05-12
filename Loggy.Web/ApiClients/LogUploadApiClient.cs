@@ -1,5 +1,5 @@
-
-using Loggy.Models;
+using Loggy.Models.Logs;
+using Loggy.Models.Logs.Classes;
 using Microsoft.AspNetCore.Components.Forms;
 using System.Collections;
 using System.Data;
@@ -15,8 +15,14 @@ public class LogUploadApiClient(HttpClient httpClient)
         using var content = new MultipartFormDataContent();
         using var stream = file.OpenReadStream(maxAllowedSize: 10 * 1024 * 1024, cancellationToken: cancellationToken); // 10MB limit, adjust as needed
         using var streamContent = new StreamContent(stream);
+        var contentType = string.IsNullOrWhiteSpace(file.ContentType) ? "application/octet-stream" : file.ContentType;
 
-        streamContent.Headers.ContentType = new MediaTypeHeaderValue(file.ContentType);
+        // Forward the browser's declared MIME type so the server can inspect it if needed.
+        streamContent.Headers.ContentType = new MediaTypeHeaderValue(contentType);
+
+
+
+        // "file" must match the [FromForm] parameter name on the server-side controller.
         content.Add(streamContent, "file", file.Name);
         var url = $"/api/LogEventProcessing/ProcessEvents";
 

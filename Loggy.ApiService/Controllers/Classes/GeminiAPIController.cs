@@ -1,6 +1,6 @@
 ﻿using Loggy.ApiService.Services.Interfaces;
-using Loggy.Models;
 using Loggy.Models.Gemini;
+using Loggy.Models.Logs.Classes;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using System.Text;

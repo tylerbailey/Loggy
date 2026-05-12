@@ -1,5 +1,7 @@
 ﻿using Loggy.Models;
 using Loggy.Models.Gemini;
+using Loggy.Models.Logs;
+using Loggy.Models.Logs.Classes;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 

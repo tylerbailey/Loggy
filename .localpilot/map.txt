@@ -1,0 +1,104 @@
+## WORKSPACE EXECUTIVE SUMMARY (YAML)
+# Generated: 2026-05-11T22:24:31.3670141-05:00
+# Root: C:\Users\Tyler\source\repos\Loggy
+Architecture:
+  Type: Backend (C#/.NET)
+  Scale: 39 relevant source files
+  Components: 0
+  Controllers: 4
+  Models: 0
+  Services: 2
+---
+- File: Loggy.sln
+  Preview: " Microsoft Visual Studio Solution File, Format Version 12.00 # Visual Studio Version 18 VisualStudioVersion = 18.6.11723.189 insiders MinimumVisualStu..."
+- File: Loggy.ApiService\Loggy.ApiService.csproj
+  Preview: "<Project Sdk='Microsoft.NET.Sdk.Web'>  <PropertyGroup>   <TargetFramework>net10.0</TargetFramework>   <ImplicitUsings>enable</ImplicitUsings>   <Nulla..."
+- File: Loggy.AppHost\Loggy.AppHost.csproj
+  Preview: "<Project Sdk='Aspire.AppHost.Sdk/13.1.0'>  <PropertyGroup>   <OutputType>Exe</OutputType>   <TargetFramework>net10.0</TargetFramework>   <ImplicitUsin..."
+- File: Loggy.Models\Loggy.Models.csproj
+  Preview: "<Project Sdk='Microsoft.NET.Sdk'>  <PropertyGroup>   <TargetFramework>net10.0</TargetFramework>   <ImplicitUsings>enable</ImplicitUsings>   <Nullable>..."
+- File: Loggy.ServiceDefaults\Loggy.ServiceDefaults.csproj
+  Preview: "<Project Sdk='Microsoft.NET.Sdk'>  <PropertyGroup>   <TargetFramework>net10.0</TargetFramework>   <ImplicitUsings>enable</ImplicitUsings>   <Nullable>..."
+- File: Loggy.Tests\Loggy.Tests.csproj
+  Preview: "<Project Sdk='Microsoft.NET.Sdk'>  <PropertyGroup>   <TargetFramework>net10.0</TargetFramework>   <ImplicitUsings>enable</ImplicitUsings>   <Nullable>..."
+- File: Loggy.Web\Loggy.Web.csproj
+  Preview: "<Project Sdk='Microsoft.NET.Sdk.Web'>  <PropertyGroup>   <TargetFramework>net10.0</TargetFramework>   <ImplicitUsings>enable</ImplicitUsings>   <Nulla..."
+- File: Loggy.slnx
+  Preview: "<Solution>  <Project Path='Loggy.ApiService/Loggy.ApiService.csproj' />  <Project Path='Loggy.AppHost/Loggy.AppHost.csproj' />  <Project Path='Loggy.M..."
+- File: .vscode\launch.json
+  Preview: "{   // Use IntelliSense to learn about possible attributes.   // Hover to view descriptions of existing attributes.   // For more information, visit: ..."
+- File: Loggy.ApiService\appsettings.Development.json
+  Preview: "{  'Logging': {   'LogLevel': {    'Default': 'Information',    'Microsoft.AspNetCore': 'Warning'   }  } } "
+- File: Loggy.ApiService\appsettings.json
+  Preview: "{  'Logging': {   'LogLevel': {    'Default': 'Information',    'Microsoft.AspNetCore': 'Warning'   }  },  'AllowedHosts': '*' } "
+- File: Loggy.ApiService\Options.cs
+  Symbols: [Options]
+  Preview: "namespace Loggy.ApiService {   public class Options   {     public string ApiKey { get; set; } = string.Empty;   } } "
+- File: Loggy.ApiService\Program.cs
+  Preview: "using Loggy.ApiService; using Loggy.ApiService.Services.Classes; using Loggy.ApiService.Services.Interfaces; using Loggy.Models; var builder = WebAppl..."
+- File: Loggy.AppHost\AppHost.cs
+  Preview: "var builder = DistributedApplication.CreateBuilder(args); var apiService = builder.AddProject<Projects.Loggy_ApiService>('apiservice')   .WithHttpHeal..."
+- File: Loggy.AppHost\appsettings.Development.json
+  Preview: "{  'Logging': {   'LogLevel': {    'Default': 'Information',    'Microsoft.AspNetCore': 'Warning'   }  } } "
+- File: Loggy.AppHost\appsettings.json
+  Preview: "{  'Logging': {   'LogLevel': {    'Default': 'Information',    'Microsoft.AspNetCore': 'Warning',    'Aspire.Hosting.Dcp': 'Warning'   }  } } "
+- File: Loggy.Models\Enums.cs
+  Symbols: [Enums]
+  Preview: "using System; using System.Collections.Generic; using System.Text; namespace Loggy.Models {   public class Enums   {     public enum SchemaTypes     {..."
+- File: Loggy.Models\SeriLogEvent.cs
+  Symbols: [SeriLogEvent]
+  Preview: "using System.Text.Json; namespace Loggy.Models; public sealed class SeriLogEvent {   public int Id { get; set; }   public DateTimeOffset Timestamp { g..."
+- File: Loggy.ServiceDefaults\Extensions.cs
+  Preview: "using Microsoft.AspNetCore.Builder; using Microsoft.AspNetCore.Diagnostics.HealthChecks; using Microsoft.Extensions.DependencyInjection; using Microso..."
+- File: Loggy.Tests\LogEventProcessingControllerTests.cs
+  Symbols: [LogEventProces]
+  Preview: "using Loggy.ApiService.Controllers.Classes; using Loggy.ApiService.Services.Interfaces; using Loggy.Models.Logs; using Microsoft.AspNetCore.Http; usin..."
+- File: Loggy.Tests\LogEventProcessingServiceTests.cs
+  Symbols: [LogEventProcessingServiceTests]
+  Preview: "using Loggy.ApiService.Services.Classes; using Loggy.Models.Logs; using Microsoft.AspNetCore.Http; using Moq; using System.Text; namespace Loggy.Tests..."
+- File: Loggy.Web\appsettings.Development.json
+  Preview: "{  'Logging': {   'LogLevel': {    'Default': 'Information',    'Microsoft.AspNetCore': 'Warning'   }  } } "
+- File: Loggy.Web\appsettings.json
+  Preview: "{  'Logging': {   'LogLevel': {    'Default': 'Information',    'Microsoft.AspNetCore': 'Warning'   }  },  'AllowedHosts': '*' } "
+- File: Loggy.Web\Program.cs
+  Preview: "using Loggy.Web; using Loggy.Web.ApiClients; using Loggy.Web.Components; var builder = WebApplication.CreateBuilder(args); // Add service defaults & A..."
+- File: Loggy.ApiService\Properties\launchSettings.json
+  Preview: "{  '$schema': 'https://json.schemastore.org/launchsettings.json',  'profiles': {   'http': {    'commandName': 'Project',    'dotnetRunMessages': true..."
+- File: Loggy.AppHost\Properties\launchSettings.json
+  Preview: "{  '$schema': 'https://json.schemastore.org/launchsettings.json',  'profiles': {   'https': {    'commandName': 'Project',    'dotnetRunMessages': tru..."
+- File: Loggy.Models\Gemini\GeminiModels.cs
+  Symbols: [GeminiResponse]
+  Preview: "using System; using System.Collections.Generic; using System.Text; using System.Text.Json.Serialization; namespace Loggy.Models.Gemini {   public clas..."
+- File: Loggy.Web\ApiClients\AnalysisApiClient.cs
+  Symbols: [AnalysisApiClient]
+  Preview: "using Loggy.Models; using Loggy.Models.Gemini; using Loggy.Models.Logs; using Loggy.Models.Logs.Classes; using System.Text.Json; using System.Text.Jso..."
+- File: Loggy.Web\ApiClients\LogUploadApiClient.cs
+  Symbols: [LogUploadApiClient, GetSortKeys, so, GroupBy, UploadLogAsync]
+  Preview: "using Loggy.Models.Logs; using Loggy.Models.Logs.Classes; using Microsoft.AspNetCore.Components.Forms; using System.Collections; using System.Data; us..."
+- File: Loggy.Web\Properties\launchSettings.json
+  Preview: "{  '$schema': 'https://json.schemastore.org/launchsettings.json',  'profiles': {   'http': {    'commandName': 'Project',    'dotnetRunMessages': true..."
+- File: Loggy.ApiService\Controllers\Classes\GeminiAPIController.cs
+  Preview: "using Loggy.ApiService.Services.Interfaces; using Loggy.Models.Gemini; using Loggy.Models.Logs.Classes; using Microsoft.AspNetCore.Mvc; using Microsof..."
+- File: Loggy.ApiService\Controllers\Classes\LogEventProcessingController.cs
+  Preview: "using Loggy.ApiService.Controllers.Interfaces; using Loggy.ApiService.Services.Interfaces; using Loggy.Models.Logs; using Loggy.Models.Logs.Classes; u..."
+- File: Loggy.ApiService\Controllers\Interfaces\IAIController.cs
+  Symbols: [IAIController, IAIController]
+  Preview: "using Loggy.Models.Logs; using Loggy.Models.Logs.Classes; using Microsoft.AspNetCore.Mvc; namespace Loggy.ApiService.Controllers.Interfaces {   public..."
+- File: Loggy.ApiService\Controllers\Interfaces\IUploadController.cs
+  Symbols: [IUploadController, IUploadController]
+  Preview: "using Loggy.Models.Logs; using Loggy.Models.Logs.Classes; using Microsoft.AspNetCore.Mvc; namespace Loggy.ApiService.Controllers.Interfaces {   public..."
+- File: Loggy.ApiService\Services\Classes\LogEventProcessingService.cs
+  Symbols: [LogEventProcessingService]
+  Preview: "using Loggy.ApiService.Services.Interfaces; using Loggy.Models.Logs.Classes; using System.Text.Json; namespace Loggy.ApiService.Services.Classes {   p..."
+- File: Loggy.ApiService\Services\Interfaces\IEventProcessingService.cs
+  Symbols: [IEventProcessingService, IEventProcessingService]
+  Preview: "using Loggy.Models.Logs; using Loggy.Models.Logs.Classes; namespace Loggy.ApiService.Services.Interfaces {   public interface IEventProcessingService ..."
+- File: Loggy.Models\Logs\Classes\LogEvent.cs
+  Symbols: [LogEvent]
+  Preview: "using Loggy.Models.Logs.Interfaces; using System; using System.Collections.Generic; using System.Text; namespace Loggy.Models.Logs.Classes {   public ..."
+- File: Loggy.Models\Logs\Classes\TreeNode.cs
+  Symbols: [TreeNode]
+  Preview: "using Loggy.Models.Logs.Interfaces; using System.Collections; namespace Loggy.Models.Logs.Classes {   public class TreeNode<T>(T value) : ITreeNode<T>..."
+- File: Loggy.Models\Logs\Interfaces\ITreeNode.cs
+  Symbols: [ITreeNode]
+  Preview: "using Loggy.Models.Logs.Classes; namespace Loggy.Models.Logs.Interfaces {   public interface ITreeNode<T> where T : class   {     T Value { get; set; ..."
