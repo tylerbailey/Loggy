@@ -1,0 +1,94 @@
+﻿@using Loggy.Models.Logs.Classes
+@using Loggy.Models.Gemini
+
+@if (!String.IsNullOrEmpty(selectedSortKey))
+{
+    <div class="col-8">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">Logs</h5>
+                <div class="accordion" id="exceptionAccordion">
+                    @foreach (var (logGroupKey, index) in _groupedLogs.Keys.Select((key, i) => (key, i)))
+                    {
+                        <div class="accordion-item">
+                            <h2 class="accordion-header">
+                                <button class="accordion-button collapsed"
+                                        type="button"
+                                        data-bs-toggle="collapse"
+                                        data-bs-target="@($"#collapseItem{index}")"
+                                        aria-expanded="false"
+                                        aria-controls="@($"collapseItem{index}")">
+                                    @logGroupKey
+                                </button>
+                            </h2>
+                            <div id="@($"collapseItem{index}")"
+                                 class="accordion-collapse collapse"
+                                 data-bs-parent="#exceptionAccordion">
+                                <div class="accordion-body">
+                                    @foreach (var item in _groupedLogs[logGroupKey])
+                                    {
+                                        <ul class="list-group list-group-flush mb-3">
+                                            @foreach (var root in item.Log.Children)
+                                            {
+                                                @foreach (var child in root.Children)
+                                                {
+                                                    <li class="@GetHighlightClass(item.Id)">
+                                                        <strong>@root.Value:</strong>
+                                                        @child.Value
+                                                        @if (child.IsRoot())
+                                                        {
+                                                            <ul class="list-group list-group-flush">
+                                                                <TreeNode treeNode="child"></TreeNode>
+                                                            </ul>
+                                                        }
+                                                    </li>
+                                                }
+                                            }
+                                        </ul>
+                                        <hr class="border border-secondary opacity-25">
+                                    }
+                                </div>
+                            </div>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+@code {
+    [Parameter]
+    public string selectedSortKey { get; set; } = string.Empty;
+
+    [Parameter]
+    public Dictionary<string, List<LogEvent>> groupedLogs { get; set; } = new();
+
+    [Parameter]
+    public LogAnalysis? analysisResult { get; set; }
+
+    private Dictionary<string, List<LogEvent>> _groupedLogs = new();
+
+    protected override void OnParametersSet()
+    {
+        _groupedLogs = groupedLogs;
+    }
+
+    private string GetHighlightClass(int id)
+    {
+        if (analysisResult?.Patterns == null) return "list-group-item";
+        return analysisResult.Patterns.Any(p => p.RelatedEventIds.Contains(id))
+            ? "list-group-item list-group-item-" + GetSeverityColor(analysisResult.Patterns
+                .FirstOrDefault(p => p.RelatedEventIds.Contains(id))?.Severity ?? "secondary")
+            : "list-group-item";
+    }
+
+    private string GetSeverityColor(string severity) => severity switch
+    {
+        "Critical" => "danger",
+        "Errors" => "danger",
+        "Warning" => "warning",
+        "Info" => "info",
+        _ => "secondary"
+    };
+}

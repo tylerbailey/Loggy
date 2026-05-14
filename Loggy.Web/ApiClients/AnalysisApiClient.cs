@@ -1,37 +1,34 @@
 ﻿using Loggy.Models;
 using Loggy.Models.Gemini;
-using Loggy.Models.Logs;
 using Loggy.Models.Logs.Classes;
 using System.Text.Json;
-using System.Text.Json.Serialization;
 
 namespace Loggy.Web.ApiClients
 {
     public class AnalysisApiClient(HttpClient httpClient)
     {
-
         public async Task<LogAnalysis> AnalyzeLogsAsync(List<LogEvent> logs, int modelOption, CancellationToken cancellationToken = default)
         {
-
-
             var translatedModelOption = Enum.Parse<Enums.ModelOptions>(modelOption.ToString());
             var url = $"/api/{translatedModelOption}API/Query";
 
             var response = await httpClient.PostAsJsonAsync(url, logs, cancellationToken);
-
-
-            response.EnsureSuccessStatusCode();      
+            response.EnsureSuccessStatusCode();
             var responseBody = await response.Content.ReadAsStringAsync();
             var responseObjects = JsonSerializer.Deserialize<GeminiResponse>(responseBody) ?? new GeminiResponse();
-            var text = responseObjects.Candidates
-    .FirstOrDefault()?.Content
-    .Parts.FirstOrDefault()?.Text ?? "No response";
+            var text = responseObjects.Candidates.FirstOrDefault()?.Content.Parts.FirstOrDefault()?.Text ?? "No response";
 
             LogAnalysis? analysis = null;
-            try { analysis = JsonSerializer.Deserialize<LogAnalysis>(text); }
-            catch (JsonException) { }
-            return analysis ?? new LogAnalysis();
+            try
+            {
+                analysis = JsonSerializer.Deserialize<LogAnalysis>(text);
+            }
+            catch (JsonException)
+            {
+                // Handle JSON parsing error, possibly log the error or return a default LogAnalysis
+            }
 
+            return analysis ?? new LogAnalysis();
         }
     }
 }

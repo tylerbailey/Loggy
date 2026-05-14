@@ -52,7 +52,7 @@ namespace Loggy.ApiService.Controllers.Classes
                                 ""patterns"": [
                                     {{
                                         ""title"": ""pattern name"",
-                                        ""severity"": ""Critical|High|Medium|Low"",
+                                        ""severity"": ""Critical|Error|Warning|Info"",
                                         ""description"": ""what is happening"",
                                         ""recommendation"": ""what to do about it"",
                                         ""relatedEventIds"": [1, 2, 3]
@@ -60,8 +60,8 @@ namespace Loggy.ApiService.Controllers.Classes
                                 ],
                                 ""errorCounts"": {{
                                     ""critical"": 0,
-                                    ""warnings"": 0,
-                                    ""errors"": 0,
+                                    ""error"": 0,
+                                    ""warning"": 0,                                    
                                     ""info"": 0
                                 }}
                             }}

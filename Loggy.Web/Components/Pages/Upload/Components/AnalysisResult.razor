@@ -1,0 +1,51 @@
+﻿@using Loggy.Models.Gemini
+
+@if (analysisResult != null)
+{
+        <div class="col-12">
+            <div class="card mb-3">
+                <div class="card-body">
+                    <h5 class="card-title">Summary</h5>
+                    <p class="card-text">@analysisResult.Summary</p>
+                </div>
+            </div>
+            <div class="card mb-3">
+                <div class="card-body">
+                    <h5 class="card-title">Error Counts</h5>
+                    <ul class="list-group list-group-flush">
+                        <li class="list-group-item text-danger">Critical: @analysisResult.ErrorCounts.Critical</li>
+                        <li class="list-group-item text-danger">Errors: @analysisResult.ErrorCounts.Error</li>
+                        <li class="list-group-item text-warning">Warnings: @analysisResult.ErrorCounts.Warning</li>
+                        <li class="list-group-item text-info">Info: @analysisResult.ErrorCounts.Info</li>
+                    </ul>
+                </div>
+            </div>
+            @foreach (var pattern in analysisResult.Patterns)
+            {
+                <div class="card mb-2">
+                    <div class="card-body">
+                        <h6 class="card-title">
+                            <span class="badge bg-@GetSeverityColor(pattern.Severity)">@pattern.Severity</span>
+                            @pattern.Title
+                        </h6>
+                        <p class="card-text">@pattern.Description</p>
+                        <p class="card-text"><strong>Recommendation:</strong> @pattern.Recommendation</p>
+                    </div>
+                </div>
+            }
+        </div>
+}
+
+@code {
+    [Parameter]
+    public LogAnalysis? analysisResult { get; set; }
+
+    private string GetSeverityColor(string severity) => severity switch
+    {
+        "Critical" => "danger",
+        "Error" => "danger",
+        "Warning" => "warning",
+        "Info" => "info",
+        _ => "secondary"
+    };
+}

@@ -1,0 +1,41 @@
+﻿<div class="col-4">
+    <div class="card mb-3">
+        <div class="card-body">
+            <h5 class="card-title">Group By</h5>
+            <ul class="list-group">
+                @foreach (var key in sortKeys)
+                {
+                    var sortKey = key;
+                    <a class="@GetItemClass(sortKey)"
+                       href=""
+                       @onclick="() => OnValueChanged.InvokeAsync(sortKey)"
+                       @onclick:preventDefault>
+                        @key
+                    </a>
+                }
+            </ul>
+        </div>
+    </div>
+</div>
+
+@code {
+    [Parameter]
+    public string selectedSortKey { get; set; } = string.Empty;
+    [Parameter]
+    public List<string> sortKeys { get; set; } = new List<string>();
+    [Parameter]
+    public EventCallback<string> OnValueChanged { get; set; }
+
+    private List<string> _sortKeys = new List<string>();
+
+    protected override void OnParametersSet()
+    {
+        _sortKeys = sortKeys;
+    }
+
+    private string GetItemClass(string key) =>
+        key == selectedSortKey
+            ? "list-group-item list-group-item-action active"
+            : "list-group-item list-group-item-action";
+
+}
