@@ -1,4 +1,5 @@
-﻿using Loggy.ApiService.Services.Interfaces;
+﻿using Loggy.ApiService.Controllers.Interfaces;
+using Loggy.ApiService.Services.Interfaces;
 using Loggy.Models.Gemini;
 using Loggy.Models.Logs.Classes;
 using Microsoft.AspNetCore.Mvc;
@@ -73,10 +74,13 @@ namespace Loggy.ApiService.Controllers.Classes
             // contents > parts structure expected by the generateContent API.
             var request = new GeminiRequest
             {
-                Contents = new List<GeminiContentPart>
-                {
-                   new() {
-                    Text = $@"Analyze the following logs and respond ONLY with a JSON object in this exact format, no markdown, no backticks:
+                Contents =
+                [
+                   new GeminiContentPart {
+                       Parts =
+                       [
+                           new GeminiPart{
+                            Text = $@"Analyze the following logs and respond ONLY with a JSON object in this exact format, no markdown, no backticks:
                             {{
                                 ""summary"": ""brief overall summary"",
                                 ""timeRange"": ""start time to end time"",
@@ -98,8 +102,10 @@ namespace Loggy.ApiService.Controllers.Classes
                             }}
                             Each log event has an Id field. Use those Id values in relatedEventIds to reference the specific events that belong to each pattern.
                             Logs: {json}"
+                           }                            
+                       ]
                    }
-                }
+                ]
             };
 
             // Serialize the full Gemini request body with the same relaxed encoder
