@@ -8,6 +8,18 @@
     <IsTestProject>true</IsTestProject>
   </PropertyGroup>
 
+  <ItemGroup>
+    <Compile Remove="API\**" />
+    <Compile Remove="Models\**" />
+    <Compile Remove="Web\**" />
+    <EmbeddedResource Remove="API\**" />
+    <EmbeddedResource Remove="Models\**" />
+    <EmbeddedResource Remove="Web\**" />
+    <None Remove="API\**" />
+    <None Remove="Models\**" />
+    <None Remove="Web\**" />
+  </ItemGroup>
+
 
   <ItemGroup>
     <PackageReference Include="Aspire.Hosting.Testing" Version="13.2.4" />
@@ -38,12 +50,6 @@
     <Using Include="Aspire.Hosting.ApplicationModel" />
     <Using Include="Aspire.Hosting.Testing" />
     <Using Include="Xunit" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="API\" />
-    <Folder Include="Models\" />
-    <Folder Include="Web\" />
   </ItemGroup>
 
 </Project>

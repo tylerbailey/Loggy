@@ -1,6 +1,6 @@
 using Loggy.ApiService.Controllers.Classes;
 using Loggy.ApiService.Services.Interfaces;
-using Loggy.Models.Logs;
+using Loggy.Models.Logs.Classes;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Moq;
@@ -34,7 +34,7 @@ public class LogEventProcessingControllerTests
         var fileMock = new Mock<IFormFile>();
         var events = new List<LogEvent>
         {
-            new() { Id = 1, Schema = new() { ["Level"] = "Info" } }
+            LogEventProcessingServiceTests.MakeEvent(1, ("Level", "Info"))
         };
         _serviceMock.Setup(s => s.GetEventsFromFile(fileMock.Object)).ReturnsAsync(events);
 
@@ -78,7 +78,7 @@ public class LogEventProcessingControllerTests
     {
         var events = new List<LogEvent>
         {
-            new() { Id = 1, Schema = new() { ["Level"] = "Info", ["Message"] = "Hi" } }
+            LogEventProcessingServiceTests.MakeEvent(1, ("Level", "Info"), ("Message", "Hi"))
         };
         _serviceMock.Setup(s => s.GetSortKeys(events)).Returns(["Level", "Message"]);
 
@@ -111,13 +111,13 @@ public class LogEventProcessingControllerTests
     {
         var events = new List<LogEvent>
         {
-            new() { Id = 1, Schema = new() { ["Level"] = "Error" } },
-            new() { Id = 2, Schema = new() { ["Level"] = "Info" } },
+            LogEventProcessingServiceTests.MakeEvent(1, ("Level", "Error")),
+            LogEventProcessingServiceTests.MakeEvent(2, ("Level", "Info")),
         };
         var grouped = new Dictionary<string, List<LogEvent>>
         {
             ["Error"] = [events[0]],
-            ["Info"]  = [events[1]],
+            ["Info"] = [events[1]],
         };
         _serviceMock.Setup(s => s.GroupBy(events, "Level")).Returns(grouped);
 
@@ -132,7 +132,10 @@ public class LogEventProcessingControllerTests
     [Fact]
     public async Task GroupBy_CallsServiceWithCorrectKey()
     {
-        var events = new List<LogEvent> { new() { Id = 1, Schema = new() { ["Source"] = "API" } } };
+        var events = new List<LogEvent>
+        {
+            LogEventProcessingServiceTests.MakeEvent(1, ("Source", "API"))
+        };
         _serviceMock.Setup(s => s.GroupBy(events, "Source"))
                     .Returns(new Dictionary<string, List<LogEvent>> { ["API"] = [events[0]] });
 
