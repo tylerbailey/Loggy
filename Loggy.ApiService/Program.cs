@@ -1,7 +1,8 @@
 using Loggy.ApiService;
+using Loggy.ApiService.Controllers.Classes;
+using Loggy.ApiService.Controllers.Interfaces;
 using Loggy.ApiService.Services.Classes;
 using Loggy.ApiService.Services.Interfaces;
-using Loggy.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 // Add service defaults & Aspire client integrations.
@@ -15,6 +16,7 @@ builder.Services.AddOpenApi();
 
 //Dependency Injection for Aspire client
 builder.Services.AddScoped<IEventProcessingService, LogEventProcessingService>();
+
 builder.Services.Configure<Options>(builder.Configuration.GetSection("MyService"));
 builder.Services.AddHttpClient("gemini", client =>
 {
