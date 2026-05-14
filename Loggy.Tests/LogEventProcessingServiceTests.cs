@@ -1,5 +1,5 @@
 using Loggy.ApiService.Services.Classes;
-using Loggy.Models;
+using Loggy.Models.Logs;
 using Microsoft.AspNetCore.Http;
 using Moq;
 using System.Text;

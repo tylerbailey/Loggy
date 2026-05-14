@@ -1,0 +1,18 @@
+﻿@using Loggy.Models.Logs.Classes
+
+ @foreach (var child in treeNode.Children)
+ {
+     <li class="list-group-item">
+        <strong>@treeNode.Value:</strong>
+        @child.Value
+        @if (treeNode.IsRoot())
+        {
+            <TreeNode treeNode="child" />
+        }
+    </li>
+ }
+
+@code {
+    [Parameter]
+    public TreeNode<string> treeNode { get; set; } = new TreeNode<string>("Root");
+}

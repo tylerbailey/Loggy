@@ -1,0 +1,88 @@
+@page "/"
+@using System.Text.Json
+@using Loggy.Models.Gemini
+@using Loggy.Models.Logs.Classes
+@using Loggy.Web.ApiClients
+@using Loggy.Web.Components.Pages.Upload.Components
+@using Microsoft.AspNetCore.Components.Forms
+@inject LogUploadApiClient logUploadApi
+@inject AnalysisApiClient analysisApiClient
+@rendermode InteractiveServer
+
+<div class="container">
+    <div class="row mb-3">
+        <div class="col-auto me-3">
+            <InputFile id="file-upload" class="form-control" OnChange="OnFileChange" />
+        </div>
+        @if (logs != null && logs.Count() > 0 && !String.IsNullOrEmpty(selectedSortKey))
+        {
+            <div class="col-auto me-3">
+                <select class="form-select" id="modelTypeSelect" @bind="modelTypeSelected">
+                    <option value="0">Gemini-2.5-flash</option>
+                </select>
+            </div>
+            <div class="col-auto">
+                <button type="button" id="analyze-button" class="btn btn-success" @onclick="AnalyzeLogs">Analyze</button>
+            </div>
+        }
+    </div>
+    <div class="row mb-3">
+        @if (!string.Empty.Equals(selectedSortKey))
+        {
+            <KeyGroup selectedSortKey="selectedSortKey" sortKeys="sortKeys" OnValueChanged="OnSortKeyChange"></KeyGroup>
+        }
+        @if (groupedLogs.Keys.Count > 0)
+        {
+            <LogGroup selectedSortKey="selectedSortKey" groupedLogs="groupedLogs" analysisResult="analysisResult" />
+        }
+        @if (analysisResult != null)
+        {
+            <AnalysisResult analysisResult="analysisResult" />
+        }
+    </div>
+</div>
+
+@code {
+    private string selectedSortKey = String.Empty;
+    private int modelTypeSelected = 0;
+    private List<LogEvent> logs = new List<LogEvent>();
+    private List<string> sortKeys = new List<string>();
+    private Dictionary<string, List<LogEvent>> groupedLogs = new Dictionary<string, List<LogEvent>>();
+    private LogAnalysis? analysisResult;
+
+    private async Task OnFileChange(InputFileChangeEventArgs e)
+    {
+        logs = new List<LogEvent>();
+        analysisResult = null;
+        sortKeys = new List<string>();
+        selectedSortKey = String.Empty;
+        groupedLogs = new Dictionary<string, List<LogEvent>>();
+        await GetLogsFromFile(e.File);
+        StateHasChanged();
+    }
+
+    public async Task AnalyzeLogs()
+    {
+        if (logs == null) return;
+        analysisResult = await analysisApiClient.AnalyzeLogsAsync(logs, modelTypeSelected);
+        StateHasChanged();
+    }
+
+    public async Task GetLogsFromFile(IBrowserFile? logFile)
+    {
+        if (logFile == null) return;
+        logs = JsonSerializer.Deserialize<List<LogEvent>>(await logUploadApi.UploadLogAsync(logFile), new JsonSerializerOptions { PropertyNameCaseInsensitive = true }) ?? [];
+        if (logs.Count == 0) return;
+        sortKeys = await logUploadApi.GetSortKeys(logs) ?? [];
+        selectedSortKey = sortKeys.FirstOrDefault() ?? "";
+        StateHasChanged();
+    }
+
+    public async Task OnSortKeyChange(string newValue)
+    {
+        groupedLogs = await logUploadApi.GroupBy(logs, newValue);
+        StateHasChanged();
+    }
+
+   
+}

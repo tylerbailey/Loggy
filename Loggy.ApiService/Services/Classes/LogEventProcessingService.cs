@@ -1,5 +1,5 @@
 ﻿using Loggy.ApiService.Services.Interfaces;
-using Loggy.Models;
+using Loggy.Models.Logs.Classes;
 using System.Text.Json;
 
 namespace Loggy.ApiService.Services.Classes
@@ -37,8 +37,8 @@ namespace Loggy.ApiService.Services.Classes
             if (events == null || events.Count == 0)
                 return [];
             var firstEvent = events[0];
-            var properties = firstEvent.Schema.Keys.ToList();
-            return properties;
+            var keys = firstEvent.Log.Children.Select(c => c.Value).ToList();
+            return keys;
         }
 
         /// <summary>
@@ -53,8 +53,11 @@ namespace Loggy.ApiService.Services.Classes
         /// </returns>
         public Dictionary<string, List<LogEvent>> GroupBy(List<LogEvent> events, string sortKey)
         {
-            return events.GroupBy(e => e.Schema.ContainsKey(sortKey) ? e.Schema[sortKey] : "Undefined")
-                         .ToDictionary(g => g.Key, g => g.ToList());
+            return events
+                    .GroupBy(e => e.Log?.Children
+                    .FirstOrDefault(c => c.Value == sortKey)?.Children.FirstOrDefault() ?.Value ?? "Undefined")
+                    .ToDictionary(g => g.Key, g => g.ToList());
+
         }
 
         /// <summary>
@@ -83,25 +86,39 @@ namespace Loggy.ApiService.Services.Classes
                 return [];
 
             content = content.Trim();
-
+            var root = new TreeNode<string>("Root");
+            // JSON array
             if (content.StartsWith('['))
             {
-                // JSON array format: deserialize the whole document at once.
-                var eventDataList = JsonSerializer.Deserialize<List<Dictionary<string, JsonElement>>>(content, _jsonOptions);
-                if (eventDataList != null)
-                    foreach (var eventData in eventDataList)
-                        events.Add(new LogEvent { Schema = eventData.ToDictionary(kv => kv.Key, kv => kv.Value.ToString()) });
+                //top level
+                var eventData = JsonSerializer.Deserialize<Dictionary<String, JsonElement>>(content, _jsonOptions) ?? [];
+                foreach (var item in eventData.Values)
+                {
+                    foreach (var key in eventData.Keys)
+                    {
+                        var parent = new TreeNode<string>(key);
+                        parent.Children.AddRange(ParseInnerJson(eventData[key]));
+                        root.AddChild(parent);
+                    }
+                }
             }
             else
             {
-                // NDJSON format: parse one JSON object per non-empty line.
+                //new line delimited JSON
                 foreach (var line in content.Split('\n'))
                 {
                     var trimmed = line.Trim();
                     if (string.IsNullOrWhiteSpace(trimmed)) continue;
 
-                    var eventData = JsonSerializer.Deserialize<Dictionary<string, JsonElement>>(trimmed, _jsonOptions);
-                    events.Add(new LogEvent { Schema = eventData?.ToDictionary(kv => kv.Key, kv => kv.Value.ToString()) ?? [] });
+                    var trimmedEventData = JsonSerializer.Deserialize<Dictionary<String, JsonElement>>(trimmed, _jsonOptions) ?? [];
+                    foreach (var key in trimmedEventData.Keys)
+                    {
+                        var parent = new TreeNode<string>(key);
+                        parent.Children.AddRange(ParseInnerJson(trimmedEventData[key]));
+                        root.AddChild(parent);
+                    }
+                    events.Add(new LogEvent() { Log = root });
+                    root = new TreeNode<string>("Root");
                 }
             }
 
@@ -112,5 +129,25 @@ namespace Loggy.ApiService.Services.Classes
 
             return events;
         }
+
+        private List<TreeNode<string>> ParseInnerJson(JsonElement element)
+        {
+            var nodes = new List<TreeNode<string>>();
+            if (element.ValueKind == JsonValueKind.Object)
+            {
+                foreach (var property in element.EnumerateObject())
+                {
+                    var node = new TreeNode<string>(property.Name);
+                    node.Children = ParseInnerJson(property.Value);
+                    nodes.Add(node);
+                }
+            }
+            else
+                nodes.Add(new TreeNode<string>(element.ToString()));
+
+
+            return nodes;
+        }
+
     }
 }

@@ -1,7 +1,6 @@
-﻿using Loggy.ApiService.Controllers.Interfaces;
-using Loggy.ApiService.Services.Interfaces;
-using Loggy.Models;
+﻿using Loggy.ApiService.Services.Interfaces;
 using Loggy.Models.Gemini;
+using Loggy.Models.Logs.Classes;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using System.Text;
@@ -76,39 +75,30 @@ namespace Loggy.ApiService.Controllers.Classes
             {
                 Contents = new List<GeminiContentPart>
                 {
-                    new GeminiContentPart
-                    {
-                        Parts = new List<GeminiPart>
-                        {
-                            new() {
-                                // The prompt instructs Gemini to return only a JSON object with a
-                                // fixed schema (no markdown fences) so the response can be parsed
-                                // directly by the client without further cleanup.
-                                Text = $@"Analyze the following logs and respond ONLY with a JSON object in this exact format, no markdown, no backticks:
-                                        {{
-                                            ""summary"": ""brief overall summary"",
-                                            ""timeRange"": ""start time to end time"",
-                                            ""patterns"": [
-                                                {{
-                                                    ""title"": ""pattern name"",
-                                                    ""severity"": ""Critical|High|Medium|Low"",
-                                                    ""description"": ""what is happening"",
-                                                    ""recommendation"": ""what to do about it"",
-                                                    ""relatedEventIds"": [1, 2, 3]
-                                                }}
-                                            ],
-                                            ""errorCounts"": {{
-                                                ""critical"": 0,
-                                                ""warnings"": 0,
-                                                ""errors"": 0,
-                                                ""info"": 0
-                                            }}
-                                        }}
-                                        Each log event has an Id field. Use those Id values in relatedEventIds to reference the specific events that belong to each pattern.
-                                        Logs: {json}"
-                            }
-                        }
-                    }
+                   new() {
+                    Text = $@"Analyze the following logs and respond ONLY with a JSON object in this exact format, no markdown, no backticks:
+                            {{
+                                ""summary"": ""brief overall summary"",
+                                ""timeRange"": ""start time to end time"",
+                                ""patterns"": [
+                                    {{
+                                        ""title"": ""pattern name"",
+                                        ""severity"": ""Critical|Error|Warning|Info"",
+                                        ""description"": ""what is happening"",
+                                        ""recommendation"": ""what to do about it"",
+                                        ""relatedEventIds"": [1, 2, 3]
+                                    }}
+                                ],
+                                ""errorCounts"": {{
+                                    ""critical"": 0,
+                                    ""error"": 0,
+                                    ""warning"": 0,                                    
+                                    ""info"": 0
+                                }}
+                            }}
+                            Each log event has an Id field. Use those Id values in relatedEventIds to reference the specific events that belong to each pattern.
+                            Logs: {json}"
+                   }
                 }
             };
 

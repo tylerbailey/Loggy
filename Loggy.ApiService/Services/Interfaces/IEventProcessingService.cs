@@ -1,6 +1,5 @@
-
-
-using Loggy.Models;
+using Loggy.Models.Logs;
+using Loggy.Models.Logs.Classes;
 
 namespace Loggy.ApiService.Services.Interfaces
 {

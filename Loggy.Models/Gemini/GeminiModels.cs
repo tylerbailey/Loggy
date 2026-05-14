@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using System.Text.Json.Serialization;
+﻿using System.Text.Json.Serialization;
 
 namespace Loggy.Models.Gemini
 {
@@ -73,11 +70,11 @@ namespace Loggy.Models.Gemini
         [JsonPropertyName("critical")]
         public int Critical { get; set; }
 
-        [JsonPropertyName("warnings")]
-        public int Warnings { get; set; }
+        [JsonPropertyName("warning")]
+        public int Warning { get; set; }
 
-        [JsonPropertyName("errors")]
-        public int Errors { get; set; }
+        [JsonPropertyName("error")]
+        public int Error { get; set; }
 
         [JsonPropertyName("info")]
         public int Info { get; set; }

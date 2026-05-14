@@ -1,6 +1,6 @@
 using Loggy.ApiService.Controllers.Classes;
 using Loggy.ApiService.Services.Interfaces;
-using Loggy.Models;
+using Loggy.Models.Logs;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Moq;
